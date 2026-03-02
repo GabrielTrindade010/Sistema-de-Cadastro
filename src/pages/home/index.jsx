@@ -1,22 +1,37 @@
+import { useState, useEffect } from 'react';
 import './style.css'
 import Trash from '../../assets/trash.svg';
+import api from '../../services/api';
 
 function Home() {
 
-  const users = [
-    {
-      id: 'id_52412341',
-      name: 'Gabriel Dias Trindade',
-      age: 17,
-      email: 'teste@email.com'
-    },
-    {
-      id: 'id_7907012358',
-      name: 'Rebeca Fuschini',
-      age: 18,
-      email: 'teste2@email.com'
-    }
-];
+  const [users, setUsers] = useState([]);
+
+  async function getUsers() {
+    const response = await api.get("/api/users");
+    setUsers(response.data);
+  }
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    console.log(users);
+  }, [users]);
+
+  function calculateAge(dateOfBirth) {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const month = today.getMonth() - birthDate.getMonth();
+
+  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
 
   return (
     <>
@@ -35,7 +50,10 @@ function Home() {
               <div key={user.id} className='card'>
                 <div>
                   <p>Nome: <span>{ user.name }</span></p>
-                  <p>Idade: <span>{ user.age }</span></p>
+                  <p>
+                    Idade: 
+                    <span> {calculateAge(user.date_of_birth)} anos</span>
+                  </p>
                   <p>Email: <span>{ user.email }</span></p>
                   <button>
                       <img src={Trash} alt="Logo da Lixeira" />
@@ -50,4 +68,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Home;
